@@ -1,0 +1,13 @@
+@if (labelsService.labelsLoaded()) {
+  <nav-menu></nav-menu>
+}
+
+@if (labelsService.labelsLoaded()) {
+  <div class='body-content'>
+    <router-outlet></router-outlet>
+  </div>
+}
+
+@if (labelsService.labelsLoaded()) {
+  <app-footer></app-footer>
+}
