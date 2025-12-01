@@ -1,0 +1,86 @@
+<form #attendeeForm="ngForm" (ngSubmit)="confirmEdit(attendeeForm)" novalidate>
+  <div class="row">
+    @if (isJapanese) {
+      <div class="col tablecol">
+        @if (editing) {
+          <input type="text" required class="form-control input-sm" name="lastName" placeholder="{{ labelsService.translateLabel('LastName', 'Last Name') | async }}" [(ngModel)]="attendee.lastName" />
+        }
+        @if (!editing) {
+          <span>{{ attendee.lastName }}</span>
+        }
+      </div>
+    }
+    <div class="col tablecol">
+      @if (editing) {
+        <input #firstName type="text" required class="form-control input-sm" name="firstName" placeholder="{{ labelsService.translateLabel('FirstName', 'First Name') | async }}" [(ngModel)]="attendee.firstName" />
+      }
+      @if (!editing) {
+        <span>{{ attendee.firstName }}</span>
+      }
+    </div>
+    @if (!isJapanese) {
+      <div class="col tablecol">
+        @if (editing) {
+          <input type="text" required class="form-control input-sm" name="lastName" placeholder="{{ labelsService.translateLabel('LastName', 'Last Name') | async }}" [(ngModel)]="attendee.lastName" />
+        }
+        @if (!editing) {
+          <span>{{ attendee.lastName }}</span>
+        }
+      </div>
+    }
+    <div class="col tablecol">
+      @if (editing) {
+        <input type="email" required class="form-control input-sm" name="email" placeholder="{{ labelsService.translateLabel('EmailAddress', 'Email address') | async }}" [(ngModel)]="attendee.email" />
+      }
+      @if (!editing) {
+        <span>{{ attendee.email }}</span>
+      }
+    </div>
+    @if (passes && passes.length > 0 && !waitlisted) {
+      <div class="col tablecol">
+        @if (editing) {
+          <select name="passId" required class="form-control" [(ngModel)]="attendee.passId">
+            <option disabled value="" labelTaguseless="'SelectAPass'">Select a pass</option>
+            @for (pass of passes; track pass) {
+              <option [value]="pass.passId" [attr.disabled]="pass.numberOfPassesLeft > pass.passesUsed || waitlisted ? null : ''">
+                {{ pass.passName + ' (' + pass.currencySymbol + pass.price + ')' }}
+                @if (pass.numberOfPassesLeft == 0) {
+                  <div> - <span labelTaguseless="'SoldOut'">Sold out</span></div>
+                }
+              </option>
+            }
+          </select>
+        }
+        @if (!editing) {
+          <span>{{ passDisplayString(attendee.passId) }}</span>
+        }
+      </div>
+    }
+    @if (canAutoRegister()) {
+      <div class="col-1 tablecol auto-register">
+        <label class="switch {{ !editing ? 'disabled-switch' : '' }}">
+          <input type="checkbox" [(ngModel)]="attendee.autoRegister" name="autoRegister" [attr.disabled]="!editing ? '' : null" />
+          <span class="slider round"></span>
+        </label>
+      </div>
+    }
+
+    @if (editing) {
+      <div class="col-1 tablecol controls-cell">
+        &nbsp;
+        <button type="submit" class="control-btn submit-btn addAttendee" [disabled]="!(attendeeForm.valid && isFormValid)" title="{{ placeholder ? (labelsService.translateLabel('AddAttendee', 'Add attendee') | async) : (labelsService.translateLabel('SaveChanges', 'Save changes') | async) }}"><span class="fa {{ placeholder ? 'fa-plus' : 'fa-check' }}"></span></button>
+        @if (!placeholder) {
+          <button class="control-btn" (click)="cancelEdit()" title="{{ labelsService.translateLabel('DiscardChanges', 'Discard changes') | async }}"><span class="fa fa-remove"></span></button>
+        }
+      </div>
+    }
+    @if (!editing) {
+      <div class="col-1 tablecol controls-cell">
+        <button class="control-btn" (click)="switchToEdit(attendee)" title="{{ labelsService.translateLabel('EditAttendee', 'Edit attendee') | async }}"><span class="fa fa-edit"></span></button>
+        @if (!placeholder) {
+          <button class="control-btn" (click)="removeAttendee()" title="{{ labelsService.translateLabel('RemoveAttendee', 'Remove attendee') | async }}"><span class="fa fa-trash icon-padding"></span></button>
+        }
+      </div>
+    }
+  </div>
+</form>
