@@ -1,0 +1,32 @@
+<div class="container">
+  <div class="page-header">
+    <h3 >Session Tracks</h3>
+  </div>
+</div>
+
+@if (sessionTracks && sessionTracks.length == 0) {
+  <p >No session tracks are associated to this event.</p>
+}
+
+@if (sessionTracks && sessionTracks.length > 0) {
+  <div class="container">
+    <div id="accordion">
+      @for (track of sessionTracks; track track; let i = $index) {
+        <div class="card">
+          <div class="card-header" [attr.id]="'heading' + i">
+            <h5 class="mb-0">
+              <button class="btn btn-link collapsed" data-toggle="collapse" [attr.data-target]="'#collapse' + i" aria-expanded="true" [attr.aria-controls]="'collapse' + i">
+                {{ track.name }}
+              </button>
+            </h5>
+          </div>
+          <div [attr.id]="'collapse' + i" class="collapse" [attr.aria-labelledby]="'heading' + i" data-parent="#accordion">
+            <div class="card-body">
+              <app-listofsessionspertrack [trackId]="track.id"></app-listofsessionspertrack>
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+}
