@@ -1,0 +1,516 @@
+<!-- @if (!dataLoaded()) {
+  <div class="spinner-container">
+    <app-spinner></app-spinner>
+  </div>
+} -->
+
+@if (dataLoaded()) {
+  <div>
+    <div #top></div>
+    <div class="container">
+      <div class="page-header">
+        <h1 >Registration</h1>
+      </div>
+    </div>
+    @if (errorMessage) {
+      <div id="error" class="container">
+        <app-errormessage [translatedErrorMessage]="'RegistrationFailed'" [serverErrorMessage]="errorMessage">
+        </app-errormessage>
+      </div>
+    }
+    <div class="container">
+      <form #f="ngForm" (ngSubmit)="goToCart()" novalidate #customRegistrationFieldsForm="ngForm">
+        <div class="accordion" id="formAccordion">
+          @for (attendee of attendees; track attendee; let index = $index) {
+            <div>
+              <div class="card">
+                <div class="card-header" id="{{ 'heading' + index }}">
+                  <h5 class="mb-0">
+                    <div class="d-inline-flex justify-content-start">
+                      <button class="btn btn-link" id="{{ 'headingButton' + index }}" type="button" data-toggle="collapse" [attr.data-target]="'#collapse' + index" aria-expanded="true" [attr.aria-controls]="'collapse' + index">
+                        Registrant {{index + 1}}
+                      </button>
+                    </div>
+                    @if (index > 0) {
+                      <div class="d-inline-flex justify-content-end">
+                        <button type="button " class="btn btn-danger" (click)="removeAttendee(index);">
+                          Remove
+                        </button>
+                      </div>
+                    }
+                  </h5>
+                </div>
+                <div id="{{ 'collapse' + index }}" class="{{'collapse' + (index === attendees.length - 1 || (attendees.length === 0) ? 'show' : '')}}" [attr.aria-labelledby]="'heading' + index" data-parent="#formAccordion">
+                  <div class="card-body card-body-border">
+                    <h4>Registrant Information</h4>
+                    <div class="form-row">
+                      @if (isJapanese) {
+                        <div class="col-md-4">
+                          <div class="form-group">
+                            <label class="req-label" for="{{ 'japanLastName' + index}} " >Last Name</label>
+                            <input id="{{ 'japanLastName' + index}}" type="text" required class="form-control input-sm" name="lastName" #lastName="ngModel" placeholder="{{ labelsService.translateLabel('LastName', 'Last Name') | async }}" [(ngModel)]="attendee.lastName" />
+                            @if (lastName.invalid && (lastName.dirty || lastName.touched)) {
+                              <div class="alert alert-danger">
+                                @if (lastName?.errors.required) {
+                                  <div>
+                                    Last Name is required.
+                                  </div>
+                                }
+                              </div>
+                            }
+                          </div>
+                        </div>
+                      }
+                      <div class="col-md-4">
+                        <div class="form-group">
+                          <label class="req-label" for="{{ 'firstName' + index}}" >First Name</label>
+                          <input id="{{ 'firstName' + index}}" type="text" required class="form-control input-sm" name="firstName{{index}}" #firstName="ngModel" placeholder="{{ labelsService.translateLabel('FirstName', 'First Name') | async }}" [(ngModel)]="attendee.firstName"
+                            (blur)="namesOnBlur('first')" />
+                          @if (firstName.invalid && (firstName.dirty || firstName.touched)) {
+                            <div class="alert alert-danger">
+                              @if (firstName?.errors.required) {
+                                <div>
+                                  First Name is required.
+                                </div>
+                              }
+                            </div>
+                          }
+                        </div>
+                      </div>
+                      @if (!isJapanese) {
+                        <div class="col-md-4">
+                          <div class="form-group">
+                            <label class="req-label" for="{{ 'lastName' + index}}" >Last Name</label>
+                            <input id="{{ 'lastName' + index}}" type="text" required class="form-control input-sm" name="lastName{{index}}" #lastName="ngModel" placeholder="{{ labelsService.translateLabel('LastName', 'Last Name') | async }}" [(ngModel)]="attendee.lastName" (blur)="namesOnBlur('last')"
+                              />
+                            @if (lastName.invalid && (lastName.dirty || lastName.touched)) {
+                              <div class="alert alert-danger">
+                                @if (lastName?.errors.required) {
+                                  <div>
+                                    Last Name is required.
+                                  </div>
+                                }
+                              </div>
+                            }
+                          </div>
+                        </div>
+                      }
+                    </div>
+                    @if (index!=0 || (cartService != null && cartService.getItemCount() != null && cartService.getItemCount() != 0)) {
+                      <div class="form-row label-form-row">
+                        <div class="col-md-4">
+                          <div class="form-group">
+                            <input type="checkbox" id="usesameaddress" name="usesameaddress" value="usesameaddress" (click)="handleAddressClick(index);">
+                            <label for="usesameaddress" style="margin-left:1em">Use same address as Registrant 1</label>
+                          </div>
+                        </div>
+                      </div>
+                    }
+                    <!--this code goes for another one filed varAddress_ZipCodeMandatory for address -->
+                    <div class="form-row label-form-row">
+                      @if (varAddress_ZipCodeMandatory ) {
+                        <div class="col-md-4">
+                          <div class="form-group">
+                            <label class="req-label" for="{{ 'address' + index}}" >Address</label>
+                            <input id="{{ 'address' + index}}" type="text" required class="form-control input-sm" name="addresLine1{{index}}" #addressLine1="ngModel" placeholder="{{ labelsService.translateLabel('Address', 'Address') | async }}" [(ngModel)]="attendee.addressLine1"
+                              />
+                            @if (addressLine1.invalid && (addressLine1.dirty || addressLine1.touched)) {
+                              <div class="alert alert-danger">
+                                @if (addressLine1?.errors.required) {
+                                  <div>
+                                    Address is required.
+                                  </div>
+                                }
+                              </div>
+                            }
+                          </div>
+                        </div>
+                      }
+                    </div>
+                    <!--this code goes for another one filed varAddress_ZipCodeOptional & varAddressOptional_ZipCodeMandatory-->
+                    <div class="form-row label-form-row">
+                      @if (varAddress_ZipCodeOptional || varAddressOptional_ZipCodeMandatory) {
+                        <div class="col-md-4">
+                          <div class="form-group">
+                            <label for="{{ 'address' + index}}" labelTaguseless="'Address'">Address</label>
+                            <input id="{{ 'address' + index}}" type="text" class="form-control input-sm" name="addresLine1{{index}}" #addressLine1="ngModel" placeholder="{{ labelsService.translateLabel('Address', 'Address') | async }}" [(ngModel)]="attendee.addressLine1" />
+                          </div>
+                        </div>
+                      }
+                    </div>
+                    <div class="form-row label-form-row form-group">
+                      <div class="col-md-4">
+                        <input type="text" class="form-control input-sm" name="addressLine2{{index}}" #addressLine2="ngModel" placeholder="{{ labelsService.translateLabel('Suite, Apt, etc.', 'Suite, Apt, etc.') | async }}" [(ngModel)]="attendee.addressLine2" />
+                      </div>
+                    </div>
+                    <!--this code goes for another one filed varAddress_ZipCodeMandatory and varAddressOptional_ZipCodeMandatory for Zip Code -->
+                    @if (varAddress_ZipCodeMandatory || varAddressOptional_ZipCodeMandatory) {
+                      <div>
+                        <label class="req-label">Zip Code</label>
+                      </div>
+                    }
+                    <div class="form-row">
+                      @if (varAddress_ZipCodeMandatory || varAddressOptional_ZipCodeMandatory) {
+                        <div class="col-md-4 form-group">
+                          <input type="text" required pattern="[0-9]{5}$" class="form-control input-sm" name="zip{{index}}" #zip="ngModel" placeholder="{{ labelsService.translateLabel('ZipCode', 'Zip Code') | async }}" [(ngModel)]="attendee.zip" />
+                          @if (zip.invalid && zip.touched) {
+                            <div class="alert alert-danger">
+                              @if (zip?.errors.required) {
+                                <div>
+                                  Zip Code is required.
+                                </div>
+                              }
+                              @if (zip?.errors.pattern) {
+                                <div>
+                                  Invalid Zip Code.
+                                </div>
+                              }
+                            </div>
+                          }
+                        </div>
+                      }
+                      @if (varAddress_ZipCodeMandatory || varAddressOptional_ZipCodeMandatory) {
+                        <div class="col-md-4 form-group">
+                          <input type="text" required class="form-control input-sm" name="city{{index}}" #city="ngModel" placeholder="{{ labelsService.translateLabel('City', 'City') | async }}" [(ngModel)]="attendee.city" />
+                          @if (city.invalid && (city.dirty || city.touched)) {
+                            <div class="alert alert-danger">
+                              @if (city?.errors.required) {
+                                <div>
+                                  City is required.
+                                </div>
+                              }
+                            </div>
+                          }
+                        </div>
+                      }
+                      @if (varAddress_ZipCodeMandatory || varAddressOptional_ZipCodeMandatory) {
+                        <div class="col-md-4 form-group">
+                          <select class="form-control" required name="state{{index}}" #state="ngModel" [(ngModel)]="attendee.state">
+                            <option disabled value="" labelTaguseless="'SelectAState'">
+                              Select a State
+                            </option>
+                            @for (state of usStates; track state) {
+                              <option [value]="state">{{state}}</option>
+                            }
+                          </select>
+                          @if (state.invalid && (state.dirty || state.touched)) {
+                            <div class="alert alert-danger">
+                              @if (state?.errors.required) {
+                                <div>
+                                  State is required.
+                                </div>
+                              }
+                            </div>
+                          }
+                        </div>
+                      }
+                    </div>
+                    <!--this code goes for another one filed varAddress_ZipCodeOptional for Zip Code -->
+                    @if (varAddress_ZipCodeOptional) {
+                      <div>
+                        <label>Zip Code</label>
+                      </div>
+                    }
+                    <div class="form-row">
+                      @if (varAddress_ZipCodeOptional) {
+                        <div class="col-md-4 form-group">
+                          <input type="text" pattern="[0-9]{5}$" class="form-control input-sm" name="zip{{index}}" #zip="ngModel" placeholder="{{ labelsService.translateLabel('ZipCode', 'Zip Code') | async }}" [(ngModel)]="attendee.zip" />
+                          @if (zip.invalid && zip.touched) {
+                            <div class="alert alert-danger">
+                              @if (zip?.errors.pattern) {
+                                <div>
+                                  Invalid Zip Code.
+                                </div>
+                              }
+                            </div>
+                          }
+                        </div>
+                      }
+                      @if (varAddress_ZipCodeOptional) {
+                        <div class="col-md-4 form-group">
+                          <input type="text" class="form-control input-sm" name="city{{index}}" #city="ngModel" placeholder="{{ labelsService.translateLabel('City', 'City') | async }}" [(ngModel)]="attendee.city" />
+                        </div>
+                      }
+                      @if (varAddress_ZipCodeOptional) {
+                        <div class="col-md-4 form-group">
+                          <select class="form-control" name="state{{index}}" #state="ngModel" [(ngModel)]="attendee.state">
+                            <option disabled value="" labelTaguseless="'SelectAState'">
+                              Select a State
+                            </option>
+                            @for (state of usStates; track state) {
+                              <option [value]="state">{{state}}</option>
+                            }
+                          </select>
+                        </div>
+                      }
+                    </div>
+                    <div class="form-row">
+                      <div class="col-md-4">
+                        <div class="form-group">
+                          <label class="req-label" for="{{ 'phone' + index}}" labelTaguseless="'Phone'">Phone</label>
+                          <input id="{{ 'phone' + index}}" type="text" required class="form-control input-sm" name="phone{{index}}" #phone="ngModel" placeholder="Phone Number" [(ngModel)]="attendee.phone" />
+                          @if (phone.invalid && phone.touched) {
+                            <div class="alert alert-danger">
+                              @if (phone?.errors.required) {
+                                <div>
+                                  Phone Number is required.
+                                </div>
+                              }
+                            </div>
+                          }
+                        </div>
+                      </div>
+                      <div class="col-md-4">
+                        <div class="form-group">
+                          <label class="req-label" for="{{ 'email' + index}}" labelTaguseless="'Email'">Email</label>
+                          <input id="{{ 'email' + index}}" type="email" required class="form-control input-sm" name="email{{index}}" #emailModel="ngModel" placeholder="___@___.___" [(ngModel)]="attendee.email" email />
+                          @if (emailModel.invalid && emailModel.touched) {
+                            <div class="alert alert-danger">
+                              @if (emailModel?.errors.required) {
+                                <div>
+                                  Email is required.
+                                </div>
+                              }
+                              @if (emailModel?.errors.email) {
+                                <div>
+                                  Invalid Email.
+                                </div>
+                              }
+                            </div>
+                          }
+                        </div>
+                      </div>
+                    </div>
+                    @if (customRegistrationFields && customRegistrationFields.length > 0) {
+                      <div class="event-customregistrationsfields-container">
+                        @for (customRegistrationField of customRegistrationFields; track customRegistrationField; let n = $index) {
+                          <div class="customregistrationsfields-container">
+                            @if (customRegistrationField.type == 100000000) {
+                              <div class="field-container">
+                                <div class="form-group">
+                                  <label [class]="customRegistrationField.isRequired ? 'required' : ''" [for]="customRegistrationField.customRegistrationFieldId.toString() + index.toString()">{{ customRegistrationField.text }}</label>
+                                  <input type="text" class="form-control" (input)="validateCustomFieldsOnChange()" [placeholder]="customRegistrationField.text" [name]="customRegistrationField.customRegistrationFieldId.toString() + index.toString()" [id]="customRegistrationField.customRegistrationFieldId.toString() + index.toString()"
+                                    [required]="customRegistrationField.isRequired">
+                                </div>
+                              </div>
+                            }
+                            @if (customRegistrationField.type == 100000001) {
+                              <div class="field-container">
+                                <div class="form-check">
+                                  <input type="checkbox" class="form-check-input" (input)="validateCustomFieldsOnChange()" [name]="customRegistrationField.customRegistrationFieldId.toString() + index.toString()" [id]="customRegistrationField.customRegistrationFieldId.toString() + index.toString()">
+                                  <label [class]="customRegistrationField.isRequired ? 'required' : ''" [for]="customRegistrationField.customRegistrationFieldId.toString() + index.toString()">{{ customRegistrationField.text }}</label>
+                                </div>
+                              </div>
+                            }
+                            @if (customRegistrationField.type == 100000002) {
+                              <div class="field-container">
+                                <p [class]="customRegistrationField.isRequired ? 'required' : ''">
+                                  {{ customRegistrationField.text }}
+                                </p>
+                                <div class="checkboxes-container form-group">
+                                  @for (option of getOptions(customRegistrationField.choices); track option; let i = $index) {
+                                    <div class="form-check container">
+                                      <input type="checkbox" class="form-check-input" (click)="calculateMultipleCheckboxes(index)" [name]="customRegistrationField.customRegistrationFieldId.toString() + '-' + i + index.toString()" [id]="customRegistrationField.customRegistrationFieldId.toString() + '-' + i + index.toString()">
+                                      <label class="form-check-label" [for]="customRegistrationField.customRegistrationFieldId.toString() + '-' + i + index.toString()">{{ option }}</label>
+                                    </div>
+                                  }
+                                  <input type="text" [style.visibility]="'hidden'" class="form-control" [placeholder]="customRegistrationField.text" [name]="customRegistrationField.customRegistrationFieldId.toString() + index.toString()" [id]="customRegistrationField.customRegistrationFieldId.toString() + index.toString()"
+                                    [required]="customRegistrationField.isRequired">
+                                </div>
+                              </div>
+                            }
+                            @if (customRegistrationField.type == 100000003) {
+                              <div class="field-container">
+                                <div class="form-group">
+                                  <label [class]="customRegistrationField.isRequired ? 'required' : ''" [for]="customRegistrationField.customRegistrationFieldId.toString() + index.toString()">{{ customRegistrationField.text }}</label>
+                                  <select class="form-control" [name]="customRegistrationField.customRegistrationFieldId.toString() + index.toString()" [id]="customRegistrationField.customRegistrationFieldId.toString() + index.toString()" [required]="customRegistrationField.isRequired">
+                                    @if (!customRegistrationField.isRequired) {
+                                      <option></option>
+                                    }
+                                    @for (option of getOptions(customRegistrationField.choices); track option) {
+                                      <option>
+                                        {{ option }}
+                                      </option>
+                                    }
+                                  </select>
+                                </div>
+                              </div>
+                            }
+                          </div>
+                        }
+                      </div>
+                    }
+                    <div class="row form-row">
+                      <div class="col-md-4">
+                        <div class="form-group">
+                          <label class="req-label" for="{{ 'pass' + index}}">Pass Type</label>
+                          <select id="{{ 'pass' + index}}" name="passId{{index}}" #passId="ngModel" required class="form-control" [(ngModel)]="attendee.passId">
+                            <option disabled value="">
+                              Select a Pass Type
+                            </option>
+                            @for (pass of passes; track pass) {
+                              @if ((pass.numberOfPassesLeft > 0 && pass.numberOfPassesLeft - pass.passesUsed > 0 && !cartContainsWaitlister) || (pass.numberOfPassesLeft == 0 && event.showWaitlist && !cartContainsPurchaser)) {
+                                <option [value]="pass.passId">
+                                  {{ pass.passName + ' ( ' + pass.currencySymbol}}
+                                  {{pass.price | number : '1.2-2'}} {{')'}}
+                                  @if ((pass.numberOfPassesLeft == 0) || (roomLeft - pass.passesUsed == 0)) {
+                                    <div>
+                                      - <span labelTaguseless="'Waitlist'">Waitlist</span>
+                                    </div>
+                                  }
+                                  @if ((((pass.numberOfPassesLeft - pass.passesUsed) < (roomLeft - passesUsed)) ? (pass.numberOfPassesLeft - pass.passesUsed) : (roomLeft - passesUsed)) > 0 && (((pass.numberOfPassesLeft - pass.passesUsed) < (roomLeft - passesUsed)) ? (pass.numberOfPassesLeft - pass.passesUsed) : (roomLeft - passesUsed)) <= 5) {
+                                    <div>
+                                      - <span labelTaguseless="'PassesLeft'">({{((pass.numberOfPassesLeft - pass.passesUsed) < ((roomLeft - passesUsed)-pendingRegistrationCount)) ? (pass.numberOfPassesLeft - pass.passesUsed) : ((roomLeft - passesUsed)-pendingRegistrationCount)}} left)</span>
+                                    </div>
+                                  }
+                                </option>
+                              }
+                            }
+                          </select>
+                          @if (passId.invalid && (passId.dirty || passId.touched)) {
+                            <div class="alert alert-danger">
+                              @if (passId?.errors.required) {
+                                <div>
+                                  Please select a Pass Type.
+                                </div>
+                              }
+                            </div>
+                          }
+                        </div>
+                      </div>
+                    </div>
+                    @if (addons.length > 0) {
+                      <div>
+                        <h4>Add-Ons</h4>
+                      </div>
+                    }
+                    @for (addon of addons; track addon; let i = $index) {
+                      <div class="row form-row">
+                        <div class="col-md-4">
+                          <div class="form-group">
+                            <label for="{{ 'addon' + index + i}}">
+                              {{ ((addon.type == null) ? '' : (addon.type + ': ')) + addon.name + '( $' }}
+                              {{addon.price | number : '1.2-2'}} {{')' }}
+                            </label>
+                            <input id="{{ 'addon' + index + i}}" type="text" pattern="[0-9]+" class="form-control input-sm" name="addon{{index + i}}" #addonField="ngModel" placeholder="{{ labelsService.translateLabel('Quantity', 'Quantity') | async }}" [(ngModel)]="attendee.chosenAddons[i].quantity"
+                              />
+                            @if (addonField.invalid && addonField.touched) {
+                              <div class="alert alert-danger">
+                                @if (addonField?.errors.pattern) {
+                                  <div>
+                                    Invalid Quantity.
+                                  </div>
+                                }
+                              </div>
+                            }
+                          </div>
+                        </div>
+                      </div>
+                    }
+                    @if (hasDiscounts) {
+                      <div class="row form-row">
+                        <div class="col-md-4">
+                          <div class="form-group">
+                            <input id="discount" #discount="ngModel" type="text" class="form-control input-sm" name="discount{{index}}" #email="ngModel" placeholder="{{ labelsService.translateLabel('Discount Code', 'Discount Code') | async }}" [(ngModel)]="discountCode" />
+                          </div>
+                          @if (!validDiscount[index] && discountChecked[index]) {
+                            <div class="alert alert-danger">
+                              Discount Code not valid.
+                            </div>
+                          }
+                          @if (validDiscount[index] && discountChecked[index]) {
+                            <div class="alert alert-success">
+                              Discount Code applied!
+                            </div>
+                          }
+                        </div>
+                        <div class="col-md-2">
+                          <button type="button" class="btn btn-primary" (click)="validateDiscountCode(index)">
+                            Apply
+                          </button>
+                        </div>
+                        @if (attendees[index].selectedDiscount) {
+                          <div class="col-md-2">
+                            <button type="button" class="btn btn-primary" (click)="removeDiscountCode(index)">
+                              Remove Discount
+                            </button>
+                          </div>
+                        }
+                      </div>
+                    }
+                  </div>
+                </div>
+              </div>
+            </div>
+          }
+        </div>
+        <div class="container totals">
+          @if (calculateSubTotal() > 0) {
+            <div class="row form-row">
+              <div class="col-md-4">
+                <h6>Total for Passes</h6>
+              </div>
+              <div class="col-md-4">
+                <h6>${{ calculateSubTotal() | number : '1.2-2' }} </h6>
+              </div>
+            </div>
+          }
+          @if (calculateAddOnTotal() > 0) {
+            <div class="row form-row">
+              <div class="col-md-4">
+                <h6>Add-On Total</h6>
+              </div>
+              <div class="col-md-4">
+                <h6>${{ calculateAddOnTotal() | number : '1.2-2' }} </h6>
+              </div>
+            </div>
+          }
+          @if (discountAmount != 0) {
+            <div class="row form-row">
+              <div class="col-md-4">
+                <h6>Discount Applied</h6>
+              </div>
+              <div class="col-md-4">
+                <h6>-${{ calculateDiscountTotal() | number : '1.2-2' }} </h6>
+              </div>
+            </div>
+          }
+          <div class="row form-row">
+            <div class="col-md-4">
+              <h6>Total Amount</h6>
+            </div>
+            <div class="col-md-4">
+              <h6>${{ calculateTotal() | number : '1.2-2' }} </h6>
+            </div>
+          </div>
+        </div>
+        @if (useCaptcha) {
+          <div>
+            <!-- <app-captcha></app-captcha> -->
+          </div>
+        }
+        @if (onePassLeft() && event.showWaitlist && f.valid) {
+          <div>
+            If you wish to add additional registrants, they can be added to the waitlist. Please proceed to Checkout now to complete this registration, then return to the class details page to register for the waitlist.
+          </div>
+        }
+        <div class="checkout-container">
+          <button class="btn btn-primary btn-space" type="button" (click)="newAttendee('','','','','','','','','',top)" [disabled]="!f.valid || onePassLeft() || expired || !event.customFields.psjh_ispublished">
+            Register Others for this Class
+          </button>
+          <button class="btn btn-primary btn-space" type="button" (click)="goToHome()" [disabled]="processing || !f.valid || expired || !event.customFields.psjh_ispublished">
+            Save &amp; Search for Another Class
+          </button>
+          <button class="btn btn-primary" type="submit" [disabled]="processing || !f.valid || expired || !event.customFields.psjh_ispublished || varIsMandatoryFilled">
+            <span><i class="fa fa-shopping-cart"></i> Continue to Cart</span>
+            @if (processing) {
+              <span labelTaguseless="'Processing'">
+                <span class="fa fa-spinner fa-spin"></span>Processing
+              </span>
+            }
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+}
