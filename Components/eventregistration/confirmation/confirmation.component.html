@@ -1,0 +1,84 @@
+<div class="container">
+  <div class="page-header">
+    <h3>&nbsp;</h3>
+    <h5>&nbsp;</h5>
+  </div>
+</div>
+
+<div class='container'>
+  <div class='page-heading'>
+    <div class='page-header'>
+      <h1>
+        @if (waitlist.length === 0 && cart.length > 0) {
+          <span class='RegistrationConfirmation'>
+            Registration
+            Summary
+          </span>
+        }
+        @if (waitlist.length > 0) {
+          <span class='RegistrationConfirmation' labelTaguseless="'WaitlistConfirmation'">
+            Waitlist
+            Confirmation
+          </span>
+        }
+      </h1>
+    </div>
+  </div>
+  @if (waitlist.length > 0) {
+    <div>
+      <p>You will be notified by email if you are able to register for the following waitlisted class</p>
+      @for (item of waitlist; track item) {
+        <div>
+          <p>
+            Name: {{ item.attendee.firstName + ' ' + item.attendee.lastName }} <br />
+            Email: {{ item.attendee.email }} <br />
+            Class Name: {{ item.event.eventName }} <br />
+            Dates: {{ (item.event.endDate.toString().indexOf('3000') == -1) ? (item.event.startDate | date:'short') : '' }}
+            {{ (item.event.endDate.toString().indexOf('3000') == -1) ? ' - ' : '' }}
+            {{ (item.event.endDate.toString().indexOf('3000') == -1) ? (item.event.endDate | date:'short') : '' }}<br />
+          </p>
+          <p>
+            <button class="btn btn-primary" (click)="routetoEvent(item.event.readableEventId)">Register Others for this Class</button>
+          </p>
+        </div>
+      }
+    </div>
+  }
+  @if (waitlist.length === 0 && cart.length > 0) {
+    <div>
+      <p>Thank you for your registration. Please look for a confirmation email with all of the course details in your inbox momentarily.</p>
+      @for (cartItem of cart; track cartItem) {
+        <div class="row">
+          <div class="col-lg-12">
+            <div class="jumbotron jumbotron-fluid jumbo-padding all">
+              <div class="container">
+                <h4>
+                  {{ cartItem.event.eventName }}
+                </h4>
+                <h6>
+                  {{ (cartItem.event.endDate.toString().indexOf('3000') == -1) ? (cartItem.event.startDate | date:'short') : '' }}
+                  {{ (cartItem.event.endDate.toString().indexOf('3000') == -1) ? ' - ' : '' }}
+                  {{ (cartItem.event.endDate.toString().indexOf('3000') == -1) ? (cartItem.event.endDate | date: 'short') : '' }}
+                </h6>
+                <p><b>Registrant</b>: {{cartItem.attendee.firstName + ' ' + cartItem.attendee.lastName}}</p>
+                <p><b>Confirmation Code:</b> {{ cartItem.confirmation }}</p>
+                <p><b>Email:</b> {{ cartItem.attendee.email }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      }
+      <div class="row">
+        <div class="col-lg-6 offset-lg-3">
+          <div class="jumbotron jumbotron-fluid jumbo-padding all">
+            <h5 class="text-right">
+              Total Cost:
+              ${{ getPassSubtotal() - discountTotal + getAddOnSubtotal() | number : '1.2-2' }}
+            </h5>
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+  <button class="btn btn-primary" (click)="routeToHome()">Home</button>
+</div>
