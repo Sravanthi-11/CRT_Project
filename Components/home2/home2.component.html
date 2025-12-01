@@ -1,0 +1,128 @@
+@if (loading) {
+  <div class="spinner-container">
+    <app-spinner></app-spinner>
+  </div>
+}
+
+@if (!loading) {
+  <div>
+    <div class="container">
+      <div class="page-header">
+        <h1 labelTaguseless="'HomeClass'">
+          <i class="fa fa-graduation-cap"></i>&nbsp;Classes and Events
+        </h1>
+      </div>
+      @if (this.cartItemList.length > 0) {
+        You currently have {{
+        this.cartItemList.length
+        }} item(s) in your cart.
+        <button class="btn btn-outline-primary my-2 my-sm-0 btn-space" type="button" (click)="routeToCart()">View Cart</button>
+        <button class="btn btn-outline-primary my-2 my-sm-0 btn-space" type="button" (click)="emptyCart()">Empty Cart</button>
+      }
+      <div class="">
+        <h5 class="page-header" labelTaguseless="'HomeIntro1'">Basic Search Options</h5>
+        <p labelTaguseless="'HomeIntro2'"></p>
+      </div>
+    </div>
+    <div class="container">
+      <div class="row">
+        <form class="form-container" [formGroup]="searchForm" (ngSubmit)="filterEvents()" style="width:100%">
+          <div class="row">            <div class="col-md-6 form-group">
+              <label class="control-label req-label" for="region">Region</label>
+              <select class="form-control" id="region"
+                formControlName="region" (change)="onRegionChange($event)">
+                <option value="Empty">Select Region</option>
+                @for (x of this.eventsearchoptions.regions; track x) {
+                  <option [value]="x.cmscode">
+                    {{x.name}}
+                  </option>
+                }
+              </select>
+            </div>
+            <div class="col-md-6 form-group">
+              <input type="text" hidden="true" formControlName="endDate" placeholder="To" class="form-control mr-sm-2"
+                bsDatepicker #dp="bsDatepicker" [bsConfig]="bsConfig" [minDate]="searchForm.get('startDate').value">
+            </div>
+          </div>
+          <div class="row">            <div class="col-md-6 form-group">
+              <label class="control-label" for="ministry">Location</label>
+              <select class="form-control" id="ministry"
+                formControlName="ministry" (change)="onMinistryChange($event)">
+                <option value="Empty">Select Location</option>
+                @for (x of this.eventsearchoptions.ministries; track x) {
+                  <option [value]="x.cmscode">
+                    {{x.name}}
+                  </option>
+                }
+              </select>
+            </div>            <div class="col-md-6 form-group">
+              <label class="control-label" for="service">Category</label>
+              <select class="form-control" id="service"
+                formControlName="service" (change)="onServiceChange($event)">
+                <option value="Empty">Select Category</option>
+                @for (y of this.eventsearchoptions.servicelines; track y) {
+                  <option [value]="y.cmscode">
+                    {{y.name}}
+                  </option>
+                }
+              </select>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-6 form-group">
+              <label class="control-label" for="keywords">Keywords</label>
+              <input class="form-control" type="search" placeholder="Keywords" aria-label="Search"
+                formControlName="keywords" (input)="clearResults()">
+            </div>
+            <div class="col-md-6 form-group">
+              <label class="control-label" for="startDate">Class Date</label>
+              <input type="text" formControlName="startDate" placeholder="From" class="form-control"
+                bsDatepicker #dp="bsDatepicker" [bsConfig]="bsConfig"
+                [maxDate]="searchForm.get('endDate').value" (input)="clearResults()">
+            </div>
+          </div>
+          <div class="row">
+            <div class="form-group" style="width: 100%;margin-top: 20px;">
+              <div #top></div>
+              <button class="btn btn-outline-primary my-2 my-sm-0" style="width:100%;" type="submit">Search Classes</button>
+              @if (!regionAndLocationSelected) {
+                <div class="alert alert-danger">
+                  Please select a region and location.
+                </div>
+              }
+              @if (refreshingResults) {
+                <div class="spinner-container">
+                  <app-spinner></app-spinner>
+                </div>
+              }
+            </div>
+          </div>
+        </form>
+      </div>
+      @if (showResults) {
+        <div id="all-events-panel" class="panel panel-default" style="border:none">
+          @if (displayEvents.length === 0 && (displaySupportGroups == null || displaySupportGroups == undefined || displaySupportGroups.length === 0)) {
+            <div class="row">
+              <div class="col-lg-12">
+                <p class="no-results">No Results</p>
+              </div>
+            </div>
+          }
+          @if (displayEvents?.length > 0) {
+            <app-event-table
+              [displayEvents]="displayEvents"
+              [resultsPage]="resultsPage"
+              (nextPage)="goToNextPage($event, top)">
+            </app-event-table>
+          }
+          <!-- <div class="row" *ngIf="displayEvents?.length === 0">
+          <div class="col-lg-12">
+            <p class="no-results">No Results</p>
+          </div>
+        </div> -->
+      </div>
+    }
+  </div>
+</div>
+}
+
