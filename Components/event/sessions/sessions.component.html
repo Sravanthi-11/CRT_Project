@@ -1,0 +1,82 @@
+@if (!sessions) {
+  <div class="spinner-container">
+    <app-spinner></app-spinner>
+  </div>
+}
+
+@if (sessions) {
+  <div style="padding-top:0px; padding-bottom:0px; margin-top:0px; margin-bottom:0px">
+    <div style="padding-top:0px; padding-bottom:0px; margin-top:0px; margin-bottom:0px" class="container">
+      <div style="padding-top:0px; padding-bottom:0px; margin-top:0px; margin-bottom:0px" class="page-header">
+        <h3 >Sessions</h3>
+      </div>
+    </div>
+    @if (errorMessage) {
+      <div class="container">
+        <app-errormessage [translatedErrorMessage]="'RegistrationFailed'" [serverErrorMessage]="errorMessage"></app-errormessage>
+      </div>
+    }
+    @if (sessions.length == 0) {
+      <p >No sessions are associated to this event.</p>
+    }
+    @if (sessions.length > 0) {
+      <div class="container">
+        <div class="filters">
+          <div class="select-date">
+            <ul class="nav nav-tabs" role="tablist">
+              @for (dateKey of dateKeys; track dateKey) {
+                <li class="nav-item">
+                  <a (click)="selectDate(dateKey)" class="nav-link {{ dateKey === selectedDateKey ? 'active' : '' }} {{ dateToCssClass(dateKey) }}" tabindex="0" role="tab">{{ dateText(dateKey) | async }}</a>
+                </li>
+              }
+            </ul>
+          </div>
+        </div>
+        <div class="separator"></div>
+        @if (sessions && sessions.length > 0) {
+          <div class="container">
+            <table class="table table-hover">
+              <thead class="thead-light">
+                <tr>
+                  <th >Name</th>
+                  <th >Start Time</th>
+                  <th >End Time</th>
+                  <th> </th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (session of currentDaySessions(); track session; let i = $index) {
+                  <tr [className]="session.detailedDescription != null && session.detailedDescription != '' ? 'active-row' : ''" data-toggle="collapse" [attr.data-target]="'#collapse' + i" aria-expanded="true" [attr.aria-controls]="'collapse' + i">
+                    <td>
+                      {{ session.name }}
+                    </td>
+                    <td>
+                      {{ session.startTimeString }}
+                    </td>
+                    <td>
+                      {{ session.endTimeString }}
+                    </td>
+                    <td>
+                      @if (session.userEligibleToRegister) {
+                        <button type="button" class="btn btn-info" (click)="registerToSession(session.id)" [disabled]="session.alreadyRegistered">Register</button>
+                      }
+                    </td>
+                  </tr>
+                  @if (session.detailedDescription != null && session.detailedDescription != '') {
+                    <tr [attr.id]="'collapse' + i" class="collapse" [attr.aria-labelledby]="'heading' + i" data-parent="#accordion">
+                      <td colspan="4" class="details-row active-row">
+                        <div>
+                          {{ session.detailedDescription }}
+                        </div>
+                      </td>
+                    </tr>
+                  }
+                }
+              </tbody>
+            </table>
+          </div>
+        }
+      </div>
+    }
+  </div>
+}
