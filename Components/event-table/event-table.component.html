@@ -1,0 +1,68 @@
+<table id="eventTable" class="table table-hover table-light" #eventTable>
+  <thead class="thead-light">
+    <tr>
+      <th labelTaguseless="'EventName'">Class Name</th>
+      <th labelTaguseless="'StartDate'">Start Date</th>
+      <th labelTaguseless="'EndDate'">End Date</th>
+      <th>Registration Status</th>
+      <th>Spaces Available</th>
+      <th>Price</th>
+      <th labelTaguseless="'City'">City</th>
+      <th labelTaguseless="'State'">State</th>
+      <th labelTaguseless="'Location'">Location</th>
+      <th labelTaguseless="'Description'">{{ 'Description' }}</th>
+    </tr>
+  </thead>
+  <tbody>
+    @for (event of displayEvents; track event) {
+      <tr class="clickable-row" attr.data-href="/event/?readableEventId={{ event.readableeventid }}"
+        >
+        @if (!event.redirectclass) {
+          <td>
+            <a [routerLink]="['/event']" [queryParams]="{readableEventId: event.readableeventid}"
+            title="{{ event.name }}">{{ event.name }}</a>
+          </td>
+        }
+        @if (event.redirectclass) {
+          <td>
+            <a href="{{event.redirecturl}}"> {{ event.name }}</a>
+          </td>
+        }
+        <td>{{ event.selfpaced ? 'N/A' : event.startdate | date:'shortDate' }} <span style="white-space: nowrap;">{{ event.selfpaced ? '' : event.startdate | date:'shortTime' }}</span></td>
+        <td>{{ event.selfpaced ? 'N/A' : event.enddate | date:'shortDate' }} <span style="white-space: nowrap;">{{ event.selfpaced ? '' : event.enddate | date:'shortTime' }}</span></td>
+        <td>{{ event.classstatus}}</td>
+        <td>{{ event.maximumeventcapacity ? event.spacesavailable : null }}</td>
+        <td>{{ event.pricing }}</td>
+        <td>{{ event.building?.city }}</td>
+        <td>{{ event.building?.stateprovince }}</td>
+        <td>{{ event.building?.name }}</td>
+        <td>
+          <span [innerHTML]="!event.showMore ? (event.description | slice:0:100) + '...' : event.description">
+          </span>
+          <a style="color:#00338E;" (click)="toggleReadMoreLess(event)">
+            {{ event.showMore ? '(Read less)' : '(Read more)' }}
+          </a>
+        </td>
+      </tr>
+    }
+  </tbody>
+</table>
+@if (displayEvents?.length === 0) {
+  <div class="row">
+    <div class="col-lg-12">
+      <p class="no-results">No Results</p>
+    </div>
+  </div>
+}
+@if (displayEvents?.length > 0) {
+  <div class="row">
+    <div class="col-lg-12">
+      @if (resultsPage > 1) {
+        <button class="btn btn-primary btn-space" (click)="goToNextPage(-1,top)" type="button" style="margin-right:3em">Prev 50</button>
+      }
+      @if (displayEvents[0].moreevents) {
+        <button class="btn btn-primary btn-space" (click)="goToNextPage(1,top)" type="button">Next 50</button>
+      }
+    </div>
+  </div>
+}
