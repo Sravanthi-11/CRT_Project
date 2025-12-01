@@ -1,0 +1,148 @@
+<div>
+  <!-- @if (loading) {
+    <div class="spinner-container">
+      <app-spinner></app-spinner>
+    </div>
+  } -->
+  @if (event) {
+    <div class="container event-banner">
+      <div>
+        <div >
+          <div class="col-md-12" style="background-color:#00338e;">
+            <h2 class="section-landing-heading" style="margin-top:1em; text-shadow:-1px -1px 0 #00338e,1px -1px 0 #00338e,-1px 1px 0 #00338e,1px 1px 0 #00338e;">{{ event.eventName }}</h2>
+            @if (event.customFields && !event.customFields.psjh_isselfpaced) {
+              <h3 class="event-date" style="margin-top:0.1em; text-shadow:-1px -1px 0 #00338e,1px -1px 0 #00338e,-1px 1px 0 #00338e,1px 1px 0 #00338e;">{{ event.startDate | date:'fullDate' }}</h3>
+            }
+          </div>
+        </div>      <div [ngStyle]="{'background-image': 'url(' + getBannerImage() + ')'}" style="background-size: cover ;background-position: center;background-repeat: no-repeat; border-color:#00338e; flex-grow:0; flex-shrink: 0; flex-basis:100%; max-width:100%; min-height:400px; z-index:1">
+
+      </div>
+      <section class="hero">
+        <div>
+          <div class="container">
+            <div class="row">
+              <div class="col-xs-12 col-md-12">
+                @if (registrationRequired) {
+                  <div class="register-container" style="margin-bottom:.50em;">
+                    <button [disabled]="!event.customFields.psjh_ispublished || registrationDisabled || expired ||durationReached " [routerLink]="['registration']" [queryParams]="{id: event.readableEventId}" class="btn btn-primary btn-lg" style="background-color:#357d2b; border-color:#357d2b">
+                      <span class='fa fa-calendar'></span>
+                      @if (event.customFields.psjh_ispublished && event.maxCapacity > event.customFields.msevtmgt_registrationcount && numberOfPassesLeft > 0 || !event.showWaitlist) {
+                        <span style="font-family: 'Helvetica Neue', Arial, Helvetica, sans-serif;" class="icon-padding" >Register Now</span>
+                      }
+                      @if (event.customFields.psjh_ispublished && (event.maxCapacity <= event.customFields.msevtmgt_registrationcount || numberOfPassesLeft <= 0) && event.showWaitlist) {
+                        <span style="font-family: 'Helvetica Neue', Arial, Helvetica, sans-serif;" class="icon-padding" >Waitlist Now </span>
+                      }
+                    </button>
+                    @if (event.customFields.psjh_ispublished && registrationDisabled) {
+                      <p style="font-family: 'Helvetica Neue', Arial, Helvetica, sans-serif; font-size:1.5rem; font-display: #212529;">Sorry, this class is full.</p>
+                    }
+                    @if (event.customFields.psjh_ispublished && expired) {
+                      <p style="font-family: 'Helvetica Neue', Arial, Helvetica, sans-serif; font-size:1.5rem; font-display: #212529;">This class has already started.</p>
+                    }
+                    @if (!event.customFields.psjh_ispublished) {
+                      <p style="font-family: 'Helvetica Neue', Arial, Helvetica, sans-serif; font-size:1.5rem; font-display: #212529;">This class is currently unavailable.</p>
+                    }
+                    @if (event.customFields.psjh_ispublished && durationReached&& !registrationDisabled && !expired) {
+                      <p style="font-family: 'Helvetica Neue', Arial, Helvetica, sans-serif; font-size:1.5rem; font-display: #212529;"> Registration has closed.</p>
+                    }
+                  </div>
+                }
+
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </section>
+      <!--<div style="flex-grow:0; flex-shrink: 0; flex-basis:65%; max-width:65%; background-size:cover; background-position:left center; background-repeat: no-repeat; z-index:0"
+      [ngStyle]="{ 'background-image': 'url(' + getBannerImage() + ')' }"
+      *ngIf="event">
+    </div>-->
+  </div>
+</div>
+
+@if (!loading && registrationRequired) {
+  <div class="container event-data-container">
+    <ul class="nav nav-tabs nav-justified">
+      <li class="nav-item">
+        <a class="nav-link active" data-toggle="pill" href="#sessionsContent">Details</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" data-toggle="pill" href="#speakersContent" >Speakers</a>
+      </li>
+    </ul>
+    <div class="tab-content">
+      <div class="tab-pane active" id="sessionsContent">
+        <div style="padding-top:0px; padding-bottom:0px; margin-top:0px; margin-bottom:0px" class="row">
+          <div style="padding-top:0px; padding-bottom:0px; margin-top:30px; margin-bottom:0px" class="col-lg-12">
+            <app-passes [readableEventId]="readableEventId"></app-passes>
+          </div>
+        </div>
+        @if (!event.customFields.psjh_isselfpaced) {
+          <div style="padding-top:0px; padding-bottom:0px; margin-top:0px; margin-bottom:0px" class="row">
+            <div style="padding-top:0px; padding-bottom:0px; margin-top:0px; margin-bottom:0px" class="col-lg-12">
+              <app-sessions [readableEventId]="readableEventId"></app-sessions>
+            </div>
+          </div>
+        }
+        <div class="row">
+          <div class="col-lg-12">
+            <div style="white-space: pre-wrap;" [innerHTML]="event.description"></div>
+          </div>
+        </div>
+        <div class="row">
+          <div style="margin-top: 30px" class="col-lg-12">
+            <img alt="Map" src="{{getLocationMapImage()}}" />
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-lg-12">
+            @if (registrationRequired) {
+              <div class="register-container" style="margin-bottom:.5em; text-align:center">
+                <button [disabled]="!event.customFields.psjh_ispublished || registrationDisabled || expired || durationReached" [routerLink]="['registration']" [queryParams]="{id: event.readableEventId}" class="btn btn-primary btn-lg" style="background-color:#00338e; border-color:#00338e;">
+                  <span class='fa fa-calendar'></span>
+                  @if (event.customFields.psjh_ispublished && event.maxCapacity > event.customFields.msevtmgt_registrationcount && numberOfPassesLeft > 0 || !event.showWaitlist) {
+                    <span class="icon-padding" >Register Now</span>
+                  }
+                  @if (event.customFields.psjh_ispublished && (event.maxCapacity <= event.customFields.msevtmgt_registrationcount || numberOfPassesLeft <= 0) && event.showWaitlist) {
+                    <span class="icon-padding" >Waitlist Now </span>
+                  }
+                </button>
+                @if (event.customFields.psjh_ispublished && registrationDisabled) {
+                  <p style="font-family: 'Helvetica Neue', Arial, Helvetica, sans-serif; font-size:1.5rem; font-display: #212529;">Sorry, this class is full.</p>
+                }
+                @if (event.customFields.psjh_ispublished && expired) {
+                  <p style="font-family: 'Helvetica Neue', Arial, Helvetica, sans-serif; font-size:1.5rem; font-display: #212529;">This class has already started.</p>
+                }
+                @if (event.customFields.psjh_ispublished && durationReached && !registrationDisabled && !expired) {
+                  <p style="font-family: 'Helvetica Neue', Arial, Helvetica, sans-serif; font-size:1.5rem; font-display: #212529;"> Registration has closed.</p>
+                }
+                @if (!event.customFields.psjh_ispublished) {
+                  <p style="font-family: 'Helvetica Neue', Arial, Helvetica, sans-serif; font-size:1.5rem; font-display: #212529;">This class is currently unavailable.</p>
+                }
+              </div>
+            }
+          </div>
+        </div>
+      </div>
+      <div style="padding-top:0px; padding-bottom:0px; margin-top:0px; margin-bottom:0px" class="tab-pane" id="speakersContent">
+        <app-speakers [readableEventId]="readableEventId"></app-speakers>
+      </div>
+    </div>
+  </div>
+}
+@if (!loading && !registrationRequired) {
+  <div class="container event-data-container">
+    <div class="row">
+      <div class="col-lg-12">
+        <div style="white-space: pre-wrap;" [innerHTML]="event.description"></div>
+      </div>
+    </div>    <div class="row">
+      <div class="col-lg-12">
+        <img alt="Map" src="{{getLocationMapImage()}}" />
+      </div>
+    </div>
+  </div>
+}
+  }
+</div>

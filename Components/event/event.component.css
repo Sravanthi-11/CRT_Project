@@ -1,0 +1,108 @@
+.event-banner {
+    max-width: 1200px;
+    background-size: cover;
+    text-align: center;
+    color: #212529;
+    display: block;
+}
+
+.my-canvas {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%,-50%);
+}
+.test123{
+opacity: 0.5;
+}
+.my-canvas > img {
+  position:relative; 
+  cursor:pointer;
+  transition: 0.25s transform;
+}
+
+.hero {
+   
+}
+
+.hero img {
+     width: 100%;
+  max-width: 400px;
+  height: auto;
+}
+
+.hero_info {
+    display: inline-block;
+    position: absolute;
+    bottom: 45%;
+}
+
+
+
+.register-container {
+    display: block;
+}
+
+.event-banner .row {
+    padding-top: 10px;
+}
+
+.register-container button {
+    border-radius: 0px;
+    font-size: 2.0rem;
+    font-family: 'Helvetica Neue', Arial, Helvetica, sans-serif;
+}
+
+.section-landing-heading {
+    font-size: 175%;
+    color: #FFFFFF;
+    text-transform: propercase;
+    font-weight: bold;
+    margin-top: 1.5em;
+    font-family: 'Helvetica Neue', Arial, Helvetica, sans-serif;
+}
+
+.event-date {
+    font-size: 135%;
+    margin-top: 2.5em;
+    text-transform: uppercase;
+    color: #FFFFFF;
+}
+
+.event-location {
+    font-size: 180%;
+    margin-top: 0;
+}
+
+.nav {
+    margin-top: 20px;
+}
+
+.event-data-container {
+    padding-top: 10px;
+    padding-bottom: 60px;
+}
+
+.spinner-container {
+    min-height: 1000px;
+    padding-top: 450px;
+}
+
+.icon-padding {
+    padding-left: 10px;
+    
+}
+
+.nav-link {
+    font-size: 20px;
+    font-weight: 1000;
+    font-family: 'Helvetica Neue',Arial,Helvetica,sans-serif;
+    color: #495057;
+}
+
+.nav-tabs .nav-item.show .nav-link, .nav-tabs .nav-link.active {
+    color: #495057;
+    background-color: #fff;
+    border-color: #fff #fff #2196F3;
+    border-bottom-width: thick;
+}
